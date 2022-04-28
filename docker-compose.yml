@@ -2,35 +2,22 @@ version: "2.2"
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.3
     ports:
-      - ${ES_PORT}:9200
+      - 9200:9200
+      - 9300:9300
     environment:
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - discovey.type: single-node
-    mem_limit: ${MEM_LIMIT}
+     - discovey.type: single-node
+    networks:
+      - elk
 
   kibana:
-    depends_on:
-      - elasticsearch
-    build: 
-      context: kibana/
-    volumes:
-      - kibanadata:/usr/share/kibana/data
+    image: docker.elastic.co/kibana/kiban:8.1.3
     ports:
-      - ${KIBANA_PORT}:5601
-    environment:
-      - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://es01:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-    mem_limit: ${MEM_LIMIT}
+      - 5601:5601
+  networks:
+      - elk
 
-
-volumes:
-  esdata:
-    driver: local
-  kibanadata:
-    driver: local
+networks:
+  elk:
+    driver: bridge
